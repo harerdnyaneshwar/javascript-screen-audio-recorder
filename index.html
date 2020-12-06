@@ -22,6 +22,8 @@
     <video autoplay />
 
     <script>
+        // we are accessing HTML Dom elements using these 3 variables
+
         const start = document.getElementById("start");
         const stop = document.getElementById("stop");
         const video = document.querySelector("video");
@@ -36,7 +38,10 @@
                 audio: true
             });
 
-            // Combine audio and screen streams to one
+            /**
+             * Combine audio and screen streams to one
+             * This will merge screen and and audio to one variable object
+             * */
             let combinedStreams = new MediaStream([...screenStream.getTracks(), ...audioStream.getTracks()]);
             recorder = new MediaRecorder(combinedStreams);
         
@@ -44,8 +49,15 @@
             recorder.ondataavailable = e => chunks.push(e.data);
             recorder.onstop = e => {
                 const completeBlob = new Blob(chunks, { type: chunks[0].type });
+                /**
+                 * On stop event we got the Video content attaching it to video tag to play on screen
+                 * This can be optional
+                 * */
                 video.src = URL.createObjectURL(completeBlob);
-                console.log('the blob', completeBlob)
+                /**
+                 * Below code will create download link for created video
+                 * Here we are attching the blob(content of the file) to link which browser will download
+                 * */
                 let v = URL.createObjectURL(completeBlob);
                 var link = document.getElementById("downloadLink"); 
                 link.href = v;
@@ -55,18 +67,20 @@
         
             recorder.start();
         }
-    
+        /**
+         * On button click start/stop call functions
+         * */
         start.addEventListener("click", () => {
             start.setAttribute("disabled", true);
             stop.removeAttribute("disabled");
-        
+            // start recording function written above will be called
             startRecording();
         });
     
         stop.addEventListener("click", () => {
             stop.setAttribute("disabled", true);
             start.removeAttribute("disabled");
-        
+            // here we stop the recording
             recorder.stop();
             stream.getVideoTracks()[0].stop();
         });
